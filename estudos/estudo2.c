@@ -20,8 +20,6 @@ int main(int argc, char *argv[]){
     DIGRAPHinsert(G,4,1);
     GRAPHinsert(G,2,3);
     DIGRAPHshow(G);
-    printf("\n");
-    
 /*
     DIGRAPHremove(G,0,1);
     DIGRAPHremove(G,0,3);
@@ -46,15 +44,32 @@ int main(int argc, char *argv[]){
         printf("Existe caminho de 1 --> 4\n");
     else
         printf("Não existe caminho de 1 --> 4\n");
+    printf("\n");
+
     
     GRAPHinsert(G,1,3);
     DIGRAPHshow(G);
-    printf("\n");
-    
     if(DIGRAPHpath(G,1,4))
         printf("Existe caminho de 1 --> 4\n");
     else
         printf("Não existe caminho de 1 --> 4\n");
+    if(DIGRAPHcycle(G))
+        printf("Existe ciclo em G\n");
+    else
+        printf("Não existe ciclo em G\n");
+    printf("\n");
+    
+    printf("\n");
+    DIGRAPHremove(G,3,1);        
+    DIGRAPHremove(G,3,2);
+    DIGRAPHshow(G);  
+    if(DIGRAPHcycle(G))
+        printf("Existe ciclo em G\n");
+    else
+        printf("Não existe ciclo em G\n");
+
+    printf("\n"); 
+
 
 return 0;
 }

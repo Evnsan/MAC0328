@@ -40,6 +40,9 @@ Digraph DIGRAPHinit(int V);
 /*Func que insere um arco v-w no digrafo G*/
 void DIGRAPHinsert(Digraph G, Vertex v, Vertex w);
 
+/*Func que remove  o arco v-w do digrafo G*/
+void DIGRAPHremove(Digraph G, Vertex v, Vertex w);
+
 /*cria novo arco com o vertice u: x.w = u e x.next = next*/
 link NEWv(Vertex u, link next);
 
@@ -72,6 +75,12 @@ int stCorte(Digraph G, Vertex s, Vertex t);
 int stCaminho(Digraph G, Vertex s, Vertex t);
 
 /* Algoritmo Kosaraju: para descobrir componentes fortemente conexas - Devolve o numero de componentes e um vetor delas*/
-int DIGRAPHsc(Digraph G);
+/*int DIGRAPHsc(Digraph G);*/
+
+/*Func que busca ciclos em um dado grafo*/
+int DIGRAPHcycle(Digraph G);
+
+/*Func que armazena em ts[0...i-1] uma permutacao de um subconjunto de vertices de G e devolve i: Se i = G->V entao ts[0...i-1] é uma ordenacao topologica*/
+int DAGts1(Digraph G, Vertex ts[]);
 
 #endif /*_LISTGRAPH_*/

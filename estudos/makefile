@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-W -Wall -ansi -pedantic -lm
-DEP=graph.h listGraph.h estudo2.c
-OBJ=graph.o listGraph.o estudo2.o
+DEP=graph.h listGraph.h QUEUE.h estudo2.c
+OBJ=graph.o listGraph.o QUEUE.o estudo2.o
 DEP2=graph.h matrixGraph.h estudo.c
 OBJ2=graph.o matrixGraph.o estudo.o
 EXECUTABLE=teste

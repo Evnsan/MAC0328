@@ -1,13 +1,15 @@
 #include "listGraph.h"
+#include "QUEUE.h"
 #include "graph.h"
 
 
 /****Declaracoes****/
 static int cnt, lbl[maxV], time, parnt[maxV], d[maxV], f[maxV];
 void dfsR(Digraph G, Vertex v);
-void pathR(Digraph G, Vertex v);
+int pathR(Digraph G, Vertex v, Vertex t);
 Digraph DIGRAPHreverse(Digraph G);
 void dfsRsc(Digraph G, Vertex v, int id);
+int cycleR(Digraph G, Vertex v);
 
 /****Fim Declaracoes****/
 
@@ -40,6 +42,30 @@ void DIGRAPHinsert(Digraph G, Vertex v, Vertex w){
         return;
     G->adj[v] = NEWv(w, G->adj[v]);
     G->A++;
+}
+
+/*Func que remove  o arco v-w do digrafo G*/
+void DIGRAPHremove(Digraph G, Vertex v, Vertex w){
+    link p = G->adj[v];
+    link q;
+    if(p->w == w){
+        G->adj[v] = p->next;
+        free(p);
+        printf("arco %2d->%2d removido!\n", v, w);
+    }
+    else{
+        q = p->next;
+        while(q){
+            if(q->w == w){
+                p->next=q->next;
+                free(q);
+                q = p;
+                printf("arco %2d->%2d removido!\n", v, w);
+            }
+            p = q;
+            q = q->next;
+        }
+     }        
 }
 
 /*cria novo arco com o vertice u: x.w = u e x.next = next*/
@@ -86,7 +112,7 @@ void dfsR(Digraph G, Vertex v){
     d[v] = time++;
     for(p = G->adj[v]; p != NULL; p = p->next)
         if(d[p->w] == -1){
-        	parnt[p->w] = v;
+            parnt[p->w] = v;
             dfsR(G, p->w);
         }
     f[v] = time++;
@@ -94,40 +120,104 @@ void dfsR(Digraph G, Vertex v){
 
 /*Func que verifica se há caminho de s-t */
 int DIGRAPHpath(Digraph G, Vertex s, Vertex t){
-	Vertex v;
-	for(v = 0; v < G->V; v++){
-		lbl[v] = 0;
-		parnt[v] = -1;
-	}
-	parnt[s] = s;
-	pathR(G,s);
-	return lbl[t];
+    Vertex v;
+    for(v = 0; v < G->V; v++){
+        lbl[v] = 0;
+        parnt[v] = -1;
+    }
+    parnt[s] = s;
+    pathR(G, s, t);
+    return lbl[t];
 }
 
 /*Func interna para formatar o vetor lbl com 1 para os vertices que se pode chegar a partir de s, dado o digrafo G. i.e. lbl[w]=1 se existe caminho de v --> w*/
-void pathR(Digraph G, Vertex v){
-	link p;
-	lbl[v] = 1;
-	for(p = G->adj[v]; p; p = p->next)
-		if(!lbl[p->w]){
-			parnt[p->w] = v;
-			pathR(G, p->w);
-		}
+/*void pathR(Digraph G, Vertex v){*/
+/*    link p;*/
+/*    lbl[v] = 1;*/
+/*    for(p = G->adj[v]; p; p = p->next)*/
+/*        if(!lbl[p->w]){*/
+/*            parnt[p->w] = v;*/
+/*            pathR(G, p->w);*/
+/*        }*/
+/*}*/
+
+/*Resolucao do professor para pathR parando ao encontrar t*/
+int pathR(Digraph G, Vertex v, Vertex t){
+    link p;
+    lbl[v] = 1;
+    if(v==t) return 1;
+    for(p = G->adj[v]; p; p = p->next)
+        if(!lbl[p->w]){
+            parnt[p->w] = v;
+            if (pathR(G, p->w, t))
+                return 1;
+        }
+    return 0;
 }
 
+/*Func que busca ciclos em um dado grafo O(A(V+A))*/
+/*int DIGRAPHcycle(Digraph G){*/
+/*    Vertex v;*/
+/*    link p;*/
+/*    for(v = 0; v < G->V; v++)*/
+/*        for(p = G->adj[v]; p; p = p->next)*/
+/*            if(DIGRAPHpath(G, p->w , v))*/
+/*                return 1;*/
+/*    return 0;*/
+/*}*/
 
-/*Func que busca ciclos em um dado grafo*/
+/*Func que busca ciclos usando os tipos de arcos encontrados na arvore O(V+A)*/
 int DIGRAPHcycle(Digraph G){
-	Vertex v;
-	link p;
-	for(v = 0; v < G->V; v++)
-		for(p = G->adj[v]; p; p = p->next)
-			if(DIGRAPHpath(G, p->w , v))
-				return 1;
-	return 0;
+    Vertex v;
+    time = 0;
+    for(v = 0; v < G->V; v++)
+        d[v] = f[v] = parnt[v] = -1;
+    for(v = 0; v < G->V; v++)
+        if(d[v] == -1){
+            parnt[v] = v;
+            if(cycleR(G,v) == 1) return 1;
+        }
+    return 0;
 }
 
+/*Func interna recursiva utilizada no DIGRAPHcycle*/
+int cycleR(Digraph G, Vertex v){
+    link p;
+    d[v] = time++;
+    for(p = G->adj[v]; p; p = p->next){
+        if(d[p->w] == -1){
+            parnt[p->w] = v;
+            if(cycleR(G, p->w)) return 1;
+        }
+        else if(f[p->w] == -1) return 1;
+    }
+    f[v] = time++;
+    return 0;
+}
 
+/*Func que armazena em ts[0...i-1] uma permutacao de um subconjunto de vertices de G e devolve i: Se i = G->V entao ts[0...i-1] é uma ordenacao topologica. Ideia base: eliminacao de fontes  O(V + A)*/
+int DAGts1(Digraph G, Vertex ts[]){
+    int i, in[maxV];
+    Vertex v;
+    link p;
+    for(v = 0; v < G->V; v++)
+        in[v] = 0;
+    for(v = 0; v < G->V; v++)
+        for(p = G->adj[v]; p; p = p->next)
+            in[p->w]++; /*grau de entrada*/
+    QUEUEinit(G->V);
+    for(v = 0; v < G->V; v++)
+        if(in[v] == 0)
+            QUEUEput(v);
+    for(i = 0; !QUEUEempty(); i++){
+        ts[i] = v = QUEUEget();
+        for(p=G->adj[v]; p; p = p->next)
+            if(--in[p->w] == 0)
+                QUEUEput(p->w);
+    }
+    QUEUEfree();
+    return i;
+}
 
 
 /* Algoritmo Kosaraju: para descobrir componentes fortemente conexas - Devolve o numero de componentes e um vetor delas*/
@@ -154,15 +244,15 @@ int DIGRAPHcycle(Digraph G){
 }
 */
 /* Parte recursiva do algoritmo de Kosaraju: DFS com fila de prioridade */
-/*void dfsRsc(Digraph G, Vertex v, int id){
-    link p;
-    sc[v] = id;
-    for(p = G->adj[v]; p; p = p->next)
-        if(sc[p->w] == -1)
-            dfsRsc(G, p->w, id);
-    pos[v] = cnt; /* não precisa */
-/*    sop[cnt++] = v;
-}*/
+/*void dfsRsc(Digraph G, Vertex v, int id){*/
+/*    link p;*/
+/*    sc[v] = id;*/
+/*    for(p = G->adj[v]; p; p = p->next)*/
+/*        if(sc[p->w] == -1)*/
+/*            dfsRsc(G, p->w, id);*/
+/*    pos[v] = cnt;  não precisa */
+/*    sop[cnt++] = v;*/
+/*}*/
     
 /* Parte para inverter o digrafo, necessaria no algoritmo de Kosaraju */
 Digraph DIGRAPHreverse(Digraph G){
