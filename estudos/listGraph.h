@@ -83,4 +83,8 @@ int DIGRAPHcycle(Digraph G);
 /*Func que armazena em ts[0...i-1] uma permutacao de um subconjunto de vertices de G e devolve i: Se i = G->V entao ts[0...i-1] é uma ordenacao topologica*/
 int DAGts1(Digraph G, Vertex ts[]);
 
+/*Func que busca ciclos em um dado grafo*/
+int DIGRAPHcycle(Digraph G);
+
+
 #endif /*_LISTGRAPH_*/

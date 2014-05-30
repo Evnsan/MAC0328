@@ -194,6 +194,7 @@ int cycleR(Digraph G, Vertex v){
     f[v] = time++;
     return 0;
 }
+<<<<<<< HEAD
 
 /*Func que armazena em ts[0...i-1] uma permutacao de um subconjunto de vertices de G e devolve i: Se i = G->V entao ts[0...i-1] é uma ordenacao topologica. Ideia base: eliminacao de fontes  O(V + A)*/
 int DAGts1(Digraph G, Vertex ts[]){
@@ -219,6 +220,8 @@ int DAGts1(Digraph G, Vertex ts[]){
     return i;
 }
 
+=======
+>>>>>>> de4155173c6cf54f5d4cf2f5cded60fe3f995dd9
 
 /* Algoritmo Kosaraju: para descobrir componentes fortemente conexas - Devolve o numero de componentes e um vetor delas*/
 /*int DIGRAPHsc(Digraph G){
